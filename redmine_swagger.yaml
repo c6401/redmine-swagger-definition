@@ -1,0 +1,112 @@
+swagger: 2.0
+host: %(host)s
+info:
+  title: Redmine API
+  version: 2.1.0
+paths:
+  /issues:
+    get:
+      operationId: getIssues
+      parameters:
+        - name: format
+          in: query
+          type: string
+          required: true
+        - name: project_id
+          in: query
+          type: integer
+        - name: subproject_id
+          in: query
+          type: integer
+        - name: tracker_id
+          in: query
+          type: integer
+        - name: status_id
+          in: query
+          type: string
+        - name: assigned_to_id
+          in: query
+          type: string
+        - name: cf_x
+          in: query
+          type: string
+        - name: offset
+          in: query
+          type: integer
+        - name: limit
+          in: query
+          type: integer
+        - name: sort
+          in: query
+          type: string
+      responses:
+        '200':
+          description: A list of issues
+          schema:
+            type: object
+            properties:
+              issues:
+                type: array
+                items:
+                  $ref: '#/definitions/Issue'
+  /issues/{issueId}:
+    get:
+      operationId: getIssueById
+      parameters:
+        - name: format
+          in: query
+          type: string
+          required: true
+        - name: issueId
+          in: path
+          type: integer
+          required: true
+      responses:
+        '200':
+          description: Issue
+          schema:
+            type: object
+            properties:
+              issue:
+                type: array
+                $ref: '#/definitions/Issue'
+definitions:
+  Generic:
+    type: object
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+  Issue:
+    type: object
+    properties:
+      id:
+        type: integer
+      author:
+        $ref: '#/definitions/Generic'
+      created_on:
+        type: string
+        format: date-time
+      description:
+        type: string
+      done_ration:
+        type: integer
+      priority:
+        $ref: '#/definitions/Generic'
+      spent_hours:
+        type: number
+      start_date:
+        type: string
+        format: date
+      status:
+        $ref: '#/definitions/Generic'
+      subject:
+        type: string
+      total_spent_hours:
+        type: number
+      tracker:
+        $ref: '#/definitions/Generic'
+      updated_on:
+        type: string
+        format: date-time
