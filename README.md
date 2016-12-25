@@ -1,0 +1,1 @@
+# redmine-swagger-definition
