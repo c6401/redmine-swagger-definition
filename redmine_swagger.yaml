@@ -49,6 +49,56 @@ paths:
                 type: array
                 items:
                   $ref: '#/definitions/Issue'
+    post:
+      operationId: postIssue
+      parameters:
+        - name: format
+          in: query
+          type: string
+          required: true
+        - name: body
+          in: body
+          schema:
+            type: object
+            properties:
+              issue:
+                type: object
+                properties:
+                  subject:
+                    type: string
+                  project_id:
+                    type: integer
+                  status_id:
+                    type: integer
+                  tracker_id:
+                    type: integer
+                  description:
+                    type: string
+                  category_id:
+                    type: integer
+                  fixed_version_id:
+                    type: integer
+                  assigned_to_id:
+                    type: integer
+                  custom_fields:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        value:
+                          type: string
+                        name: 
+                          type: string
+                        id:
+                          type: integer
+      responses:
+        '201':
+          description: Issue succesfully posted
+          schema:
+            type: object
+            properties:
+              issue:
+                $ref: '#/definitions/Issue'
   /issues/{issueId}:
     get:
       operationId: getIssueById
