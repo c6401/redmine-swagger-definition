@@ -58,11 +58,17 @@ paths:
           required: true
         - name: body
           in: body
+          required: true
           schema:
             type: object
+            required:
+              - issue
             properties:
               issue:
                 type: object
+                required:
+                  - subject
+                  - project_id
                 properties:
                   subject:
                     type: string
@@ -70,16 +76,32 @@ paths:
                     type: integer
                   status_id:
                     type: integer
+                  priority_id:
+                    type: integer
                   tracker_id:
                     type: integer
                   description:
                     type: string
                   category_id:
                     type: integer
+                    description: ID of the Target Versions
                   fixed_version_id:
                     type: integer
                   assigned_to_id:
                     type: integer
+                    description: ID of the user to assign the issue to
+                  parent_issue_id:
+                    type: integer
+                    description: ID of the parent issue
+                  watcher_user_ids:
+                    type: array
+                    description: Array of user ids to add as watchers
+                  is_private:
+                    type: boolean
+                    description: Use true or false to indicate whether the issue is private or not
+                  estimated_hours:
+                    type: integer
+                    description: Number of hours estimated for issue
                   custom_fields:
                     type: array
                     items:
@@ -87,7 +109,7 @@ paths:
                       properties:
                         value:
                           type: string
-                        name: 
+                        name:
                           type: string
                         id:
                           type: integer
@@ -99,6 +121,10 @@ paths:
             properties:
               issue:
                 $ref: '#/definitions/Issue'
+        '422':
+          description: Wrong request
+          schema:
+            type: object
   /issues/{id}:
     get:
       operationId: getIssueById
@@ -162,7 +188,7 @@ paths:
                       properties:
                         value:
                           type: string
-                        name: 
+                        name:
                           type: string
                         id:
                           type: integer
