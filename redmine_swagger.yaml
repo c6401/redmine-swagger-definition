@@ -1,5 +1,4 @@
 swagger: '2.0'
-host: %(host)s
 info:
   title: Redmine API
   version: 2.1.0
@@ -12,6 +11,10 @@ paths:
           in: query
           type: string
           required: true
+        - name: subject
+          in: query
+          type: string
+          description: you can use start query with ~ to search in content
         - name: project_id
           in: query
           type: integer
@@ -49,6 +52,10 @@ paths:
                 type: array
                 items:
                   $ref: '#/definitions/Issue'
+        '422':
+          description: Can't process request
+          schema:
+            type: object
     post:
       operationId: postIssue
       parameters:
@@ -122,7 +129,7 @@ paths:
               issue:
                 $ref: '#/definitions/Issue'
         '422':
-          description: Wrong request
+          description: Can't process request
           schema:
             type: object
   /issues/{id}:
