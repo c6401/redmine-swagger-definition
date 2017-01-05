@@ -80,7 +80,7 @@ paths:
                   subject:
                     type: string
                   project_id:
-                    type: integer
+                    type: string
                   status_id:
                     type: integer
                   priority_id:
@@ -166,8 +166,11 @@ paths:
           required: true
         - name: body
           in: body
+          required: true
           schema:
             type: object
+            required:
+              - issue
             properties:
               issue:
                 type: object
@@ -203,9 +206,62 @@ paths:
                     type: string
                   private_notes:
                     type: boolean
+                  start_date:
+                    type: string
       responses:
         '200':
           description: Successfully updated
+        '422':
+          description: Can't process request
+          schema:
+            type: object
+  /time_entries:
+    post:
+      operationId: postTimeEntrie
+      parameters:
+        - name: format
+          in: query
+          type: string
+          required: true
+        - name: body
+          in: body
+          required: true
+          schema:
+            type: object
+            required:
+              - time_entry
+            properties:
+              time_entry:
+                type: object
+                required:
+                  - hours
+                properties:
+                  issue_id:
+                    type: integer
+                  project_id:
+                    type: integer
+                  spent_on:
+                    type: string
+                    description: the date the time was spent (default to the current date)
+                  hours:
+                    type: integer
+                    description: the number of spent hours
+                  activity_id:
+                    type: integer
+                    description: the id of the time activity. This parameter is required unless a default activity is defined in Redmine.
+                  comments:
+                    type: string
+                    description: short description for the entry (255 characters max)
+      responses:
+        '201':
+          description: Time entrie successfully added
+          schema:
+            type: object
+        '422':
+          description: Can't process request
+          schema:
+            type: object
+
 definitions:
   Generic:
     type: object
