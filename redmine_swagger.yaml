@@ -18,30 +18,63 @@ paths:
         - name: project_id
           in: query
           type: integer
+          description: |
+            get issues from the project with the given id
+            (a numeric value, not a project identifier)
         - name: subproject_id
           in: query
-          type: integer
+          type: string
+          description: |
+            get issues from the subproject with the given id.
+            You can use project_id=XXX&subproject_id=!* to get
+            only the issues of a given project and none of its subprojects.
         - name: tracker_id
           in: query
           type: integer
+          description: get issues from the tracker with the given id
         - name: status_id
           in: query
           type: string
+          description: |
+            get issues with the given status id only.
+            Possible values: open, closed, *
+            to get open and closed issues, status id
         - name: assigned_to_id
           in: query
           type: string
+          description: |
+            get issues which are assigned to the given user id.
+            "me" can be used instead an ID to fetch all issues
+            from the logged in user (via API key or HTTP auth)
+        - name: created_on
+          in: query
+          type: string
+          description: >
+            To fetch issues for a date range
+            (uncrypted filter is "><2012-03-01|2012-03-07") :
+            GET /issues.json?created_on=%3E%3C2012-03-01|2012-03-07
+            To fetch issues created after a certain date (uncrypted filter is ">=2012-03-01") :
+            GET /issues.xml?created_on=%3E%3D2012-03-01
         - name: cf_x
           in: query
           type: string
+          description: |
+            get issues with the given value for custom field with an ID of x.
+            (Custom field must have 'used as a filter' checked.)
         - name: offset
           in: query
           type: integer
+          description: skip this number of issues in response (optional)
         - name: limit
           in: query
           type: integer
+          description: number of issues per page (optional)
         - name: sort
           in: query
           type: string
+          description: |
+            column to sort with. Append :desc to invert the order.
+            /issues.json?sort=category:desc,updated_on
       responses:
         '200':
           description: A list of issues
@@ -55,7 +88,7 @@ paths:
         '422':
           description: Can't process request
           schema:
-            type: object
+            $ref: '#/definitions/Error'
     post:
       operationId: postIssue
       parameters:
@@ -94,9 +127,15 @@ paths:
                     description: ID of the Target Versions
                   fixed_version_id:
                     type: integer
+                    description: |
+                      ID of the Target Versions
+                      (previously called 'Fixed Version' and still referred to
+                      as such in the API)
                   assigned_to_id:
                     type: integer
-                    description: ID of the user to assign the issue to
+                    description: |
+                      ID of the user to assign the issue to
+                      (currently no mechanism to assign by name)
                   parent_issue_id:
                     type: integer
                     description: ID of the parent issue
@@ -105,7 +144,9 @@ paths:
                     description: Array of user ids to add as watchers
                   is_private:
                     type: boolean
-                    description: Use true or false to indicate whether the issue is private or not
+                    description: |
+                      Use true or false to indicate
+                      whether the issue is private or not
                   estimated_hours:
                     type: integer
                     description: Number of hours estimated for issue
@@ -131,7 +172,7 @@ paths:
         '422':
           description: Can't process request
           schema:
-            type: object
+            $ref: '#/definitions/Error'
   /issues/{id}:
     get:
       operationId: getIssueById
@@ -144,6 +185,14 @@ paths:
           in: path
           type: integer
           required: true
+        - name: include
+          in: query
+          type: string
+          description: |
+            fetch associated data
+            (optional, use comma to fetch multiple associations).
+            Possible values: children, attachments, relations, changesets,
+            journals, watchers
       responses:
         '200':
           description: Issue
@@ -208,13 +257,14 @@ paths:
                     type: boolean
                   start_date:
                     type: string
+                    format: date
       responses:
         '200':
           description: Successfully updated
         '422':
           description: Can't process request
           schema:
-            type: object
+            $ref: '#/definitions/Error'
   /time_entries:
     post:
       operationId: postTimeEntrie
@@ -242,6 +292,7 @@ paths:
                     type: integer
                   spent_on:
                     type: string
+                    format: date-time
                     description: the date the time was spent (default to the current date)
                   hours:
                     type: integer
@@ -260,8 +311,7 @@ paths:
         '422':
           description: Can't process request
           schema:
-            type: object
-
+            $ref: '#/definitions/Error'
 definitions:
   Generic:
     type: object
@@ -275,30 +325,48 @@ definitions:
     properties:
       id:
         type: integer
-      author:
+      project:
         $ref: '#/definitions/Generic'
-      created_on:
-        type: string
-        format: date-time
-      description:
-        type: string
-      done_ration:
-        type: integer
+      tracker:
+        $ref: '#/definitions/Generic'
+      status:
+        $ref: '#/definitions/Generic'
       priority:
         $ref: '#/definitions/Generic'
-      spent_hours:
-        type: number
-      start_date:
-        type: string
-        format: date
-      status:
+      author:
+        $ref: '#/definitions/Generic'
+      category:
         $ref: '#/definitions/Generic'
       subject:
         type: string
-      total_spent_hours:
+      description:
+        type: string
+      start_date:
+        type: string
+        format: date
+      due_date:
+        type: string
+        format: date
+      done_ratio:
         type: number
-      tracker:
-        $ref: '#/definitions/Generic'
+      estimated_hours:
+        type: number
+      custom_fields:
+        type: object
+      created_on:
+        type: string
+        format: date-time
       updated_on:
         type: string
         format: date-time
+      spent_hours:
+        type: number
+      total_spent_hours:
+        type: number
+  Error:
+    type: object
+    properties:
+      errors:
+        type: array
+        items:
+          type: string
