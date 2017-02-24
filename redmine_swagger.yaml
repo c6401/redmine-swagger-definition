@@ -3,49 +3,45 @@ info:
   title: Redmine API
   version: 2.1.0
 paths:
-  /issues:
+  /issues.json:
     get:
       operationId: getIssues
       parameters:
-        - name: format
-          in: query
-          type: string
-          required: true
         - name: subject
           in: query
           type: string
-          description: you can use start query with ~ to search in content
+          description: You can use start query with ~ to search in content.
         - name: project_id
           in: query
           type: integer
-          description: |
-            get issues from the project with the given id
-            (a numeric value, not a project identifier)
+          description: >
+            Get issues from the project with the given id
+            (a numeric value, not a project identifier).
         - name: subproject_id
           in: query
           type: string
-          description: |
-            get issues from the subproject with the given id.
+          description: >
+            Get issues from the subproject with the given id.
             You can use project_id=XXX&subproject_id=!* to get
             only the issues of a given project and none of its subprojects.
         - name: tracker_id
           in: query
           type: integer
-          description: get issues from the tracker with the given id
+          description: Get issues from the tracker with the given id.
         - name: status_id
           in: query
           type: string
-          description: |
-            get issues with the given status id only.
+          description: >
+            Get issues with the given status id only.
             Possible values: open, closed, *
-            to get open and closed issues, status id
+            to get open and closed issues, status id.
         - name: assigned_to_id
           in: query
           type: string
-          description: |
-            get issues which are assigned to the given user id.
+          description: >
+            Get issues which are assigned to the given user id.
             "me" can be used instead an ID to fetch all issues
-            from the logged in user (via API key or HTTP auth)
+            from the logged in user (via API key or HTTP auth).
         - name: created_on
           in: query
           type: string
@@ -54,27 +50,27 @@ paths:
             (uncrypted filter is "><2012-03-01|2012-03-07") :
             GET /issues.json?created_on=%3E%3C2012-03-01|2012-03-07
             To fetch issues created after a certain date (uncrypted filter is ">=2012-03-01") :
-            GET /issues.xml?created_on=%3E%3D2012-03-01
+            GET /issues.xml?created_on=%3E%3D2012-03-01.
         - name: cf_x
           in: query
           type: string
-          description: |
-            get issues with the given value for custom field with an ID of x.
-            (Custom field must have 'used as a filter' checked.)
+          description: >
+            Get issues with the given value for custom field with an ID of x.
+            (Custom field must have 'used as a filter' checked).
         - name: offset
           in: query
           type: integer
-          description: skip this number of issues in response (optional)
+          description: Skip this number of issues in response (optional).
         - name: limit
           in: query
           type: integer
-          description: number of issues per page (optional)
+          description: Number of issues per page (optional).
         - name: sort
           in: query
           type: string
-          description: |
-            column to sort with. Append :desc to invert the order.
-            /issues.json?sort=category:desc,updated_on
+          description: >
+            Column to sort with. Append :desc to invert the order.
+            /issues.json?sort=category:desc,updated_on.
       responses:
         '200':
           description: A list of issues
@@ -92,10 +88,6 @@ paths:
     post:
       operationId: postIssue
       parameters:
-        - name: format
-          in: query
-          type: string
-          required: true
         - name: body
           in: body
           required: true
@@ -109,6 +101,7 @@ paths:
                 required:
                   - subject
                   - project_id
+                  - priority_id
                 properties:
                   subject:
                     type: string
@@ -142,6 +135,8 @@ paths:
                   watcher_user_ids:
                     type: array
                     description: Array of user ids to add as watchers
+                    items:
+                      type: integer
                   is_private:
                     type: boolean
                     description: |
@@ -173,14 +168,10 @@ paths:
           description: Can't process request
           schema:
             $ref: '#/definitions/Error'
-  /issues/{id}:
+  /issues/{id}.json:
     get:
       operationId: getIssueById
       parameters:
-        - name: format
-          in: query
-          type: string
-          required: true
         - name: id
           in: path
           type: integer
@@ -188,11 +179,11 @@ paths:
         - name: include
           in: query
           type: string
-          description: |
-            fetch associated data
+          description: >
+            Fetch associated data
             (optional, use comma to fetch multiple associations).
             Possible values: children, attachments, relations, changesets,
-            journals, watchers
+            journals, watchers.
       responses:
         '200':
           description: Issue
@@ -205,10 +196,6 @@ paths:
     put:
       operationId: updateIssue
       parameters:
-        - name: format
-          in: query
-          type: string
-          required: true
         - name: id
           in: path
           type: integer
@@ -247,8 +234,6 @@ paths:
                       properties:
                         value:
                           type: string
-                        name:
-                          type: string
                         id:
                           type: integer
                   notes:
@@ -265,14 +250,20 @@ paths:
           description: Can't process request
           schema:
             $ref: '#/definitions/Error'
-  /time_entries:
+    delete:
+      operationId: deleteIssueById
+      parameters:
+        - name: id
+          in: path
+          type: integer
+          required: true
+      responses:
+        '200':
+          description: Successfully deleted
+  /time_entries.json:
     post:
       operationId: postTimeEntrie
       parameters:
-        - name: format
-          in: query
-          type: string
-          required: true
         - name: body
           in: body
           required: true
@@ -312,6 +303,22 @@ paths:
           description: Can't process request
           schema:
             $ref: '#/definitions/Error'
+  /projects.json:
+    get:
+      operationId: getProjects
+      responses:
+        '200':
+          description: A list of projects
+          schema:
+            type: object
+  /issue_statuses.json:
+    get:
+      operationId: getStatuses
+      responses:
+        '200':
+          description: Issue statuses
+          schema:
+            type: object
 definitions:
   Generic:
     type: object
